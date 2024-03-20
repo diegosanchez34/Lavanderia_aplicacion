@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% load static %}
+    <link rel="icon" href="{% static 'app\img\favicon.png' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/css/style.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  </head>
+
+  <body>
+    {# Barra superior #}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" id="barra">
+      <a class="navbar-brand" href="https://delacruzlavanderia.cl/">
+        <img src="{% static 'app\img\Logo.png' %}" width="50" alt="logo" />
+        <span class="h5">De La Cruz Lavanderia</span>
+      </a>
+
+      {# Botón escritorio #}
+      <button class="btn btn-light" id="toggleBtn"><span class="navbar-toggler-icon"></span></button>
+
+      {# Botón movil #}
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+
+      <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        {# Menu movil #}
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0" id="show-mobile">
+          <li class="nav-item"><a class="nav-link" href="{% url 'index' %}"><img src="{% static 'app\img\home.svg' %}" width="37" alt="icono lavado" id="iconosvg">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'listado' %}"><img src="{% static 'app\img\pechera.svg' %}" width="40" alt="icono pechera" id="iconosvg">Pecheras</a></li>          
+          <li class="nav-item"><a class="nav-link" href="{% url 'plantas' %}"><img src="{% static 'app\img\plantas.svg' %}" width="35" alt="icono eliminar" id="iconosvg">Plantas</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'ingreso' %}"><img src="{% static 'app\img\plus.svg' %}" width="32" alt="icono lavado" id="iconosvg"> Ingreso</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'lectura' %}"><img src="{% static 'app\img\lectura.svg' %}" width="35" alt="icono lavado" id="iconosvg">Lectura</a></li>          
+          <li class="nav-item"><a class="nav-link" href="{% url 'lavado' %}"><img src="{% static 'app\img\lavado.svg' %}" width="35" alt="icono lavado" id="iconosvg">Lavado</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'eliminar' %}"><img src="{% static 'app\img\eliminar.svg' %}" width="32" alt="icono eliminar" id="iconosvg">Eliminar</a></li>
+        </ul>
+
+        {% comment %} 
+        {# Usuario movil #}
+        <div class="dropdown" id="show-mobile">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user"></i></a>
+          <div class="dropdown-menu text-center" aria-labelledby="navbarDropdownMenuLink2">
+              <b>Carlos Gonzalez</b><br />Administrador<br />
+              <button type="button" class="btn btn-danger mt-2" href="#">Cerrar Sesión</button>
+          </div>
+        </div>
+        {% endcomment %}
+      </div>
+
+      {% comment %} 
+      {# Usuario escritorio #}
+      <div class="dropdown dropleft" id="hide-mobile">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user"></i></a>
+        <div class="dropdown-menu text-center" aria-labelledby="navbarDropdownMenuLink">
+          <b>Carlos Gonzalez</b><br />Administrador<br />
+          <button type="button" class="btn btn-danger mt-2" href="#">Cerrar Sesión</button>
+        </div>
+      </div>
+      {% endcomment %}
+      
+
+    </nav>
+
+    {# Barra Lateral #}
+    <div class="sidenav" id="mySidenav">
+      <a class="nav-link" href="{% url 'index' %}"><img src="{% static 'app\img\home.svg' %}" width="33" alt="icono home" id="icono">Dashboard</a>
+      <a class="nav-link" href="{% url 'listado' %}"><img src="{% static 'app\img\pechera.svg' %}" width="39" alt="icono pechera" id="icono">Pecheras</a>      
+      <a class="nav-link" href="{% url 'plantas' %}"><img src="{% static 'app\img\plantas.svg' %}" width="35" alt="icono edificio" id="icono">Plantas</a>
+      <a class="nav-link" href="{% url 'ingreso' %}"><img src="{% static 'app\img\plus.svg' %}" width="31" alt="icono suma" id="icono"> Ingreso</a>
+      <a class="nav-link" href="{% url 'lectura' %}"><img src="{% static 'app\img\lectura.svg' %}" width="33" alt="icono lupa" id="icono"> Lectura</a>
+      <a class="nav-link" href="{% url 'lavado' %}"><img src="{% static 'app\img\lavado.svg' %}" width="35" alt="icono lavado" id="icono"> Lavado</a>
+      <a class="nav-link" href="{% url 'eliminar' %}"><img src="{% static 'app\img\eliminar.svg' %}" width="30" alt="icono eliminar" id="icono"> Eliminar</a>
+    </div>
+
+    <div id="contenido">
+      {% block contenido %}
+
+      {% endblock %}
+      <footer class="py-4 bg-light mt-auto" id="pie">
+        <div class="container-fluid px-4">
+          <div class="d-flex align-items-center justify-content-between small">
+            <div class="text-muted">Copyright &copy; Lavanderia De La Cruz 2023</div>
+            <div>
+              <a href="#">Política de privacidad</a>
+              &middot;
+              <a href="#">Términos &amp; Condiciones</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script src="{% static 'app/js/scripts.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/4e5279d3fd.js" crossorigin="anonymous"></script>
+  </body>
+</html>

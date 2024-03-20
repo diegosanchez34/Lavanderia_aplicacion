@@ -1,0 +1,88 @@
+{% extends 'app/base.html' %} {% load static %}
+
+<head>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+</head>
+
+{% block contenido %}
+
+<div>
+  <div class="row" style="display: flex;  align-items: center;">
+    <div class="col-sm-10 mb-3">
+      <h1>Listado de Pecheras</h1>
+      <Spam>Lista de todas las pecheras registradas en el sistema</Spam>
+    </div>
+    <div class="col-sm-2 mb-3">
+      <a class="btn btn-success btn-block btn-lg" href="{% url 'exportar_a_excel' %}" role="button" style="margin-left: auto;">Descargar a Excel</a>
+    </div>
+  </div><br>
+
+   
+  <div class="card mb-4">
+    {% comment %}
+    <div class="card-header">
+      <div class="row" style="display: flex; justify-content: center; align-items: center;">
+        <div class="col-sm-10">
+          <div class="form-group">
+            <label for="plantas">Planta: </label>            
+            <select class="form-select form-control d-inline-block mr-2" id="plantas" >
+                {% for valor,planta in planta_choices %}
+                  <option value="{{ valor }}">{{ planta }}</option>
+                {% endfor %}
+            </select>
+          </div> 
+        </div> 
+        <div class="col-sm-2"><div><button class="btn btn-primary btn-block btn-md">Filtar</button></div></div>   
+      </div>
+    </div>
+    {% endcomment %}
+    <div class="card-body">
+      <table class="table table-responsive-sm table-fluid">
+        <thead>
+          <tr>
+            <th>Identificador</th>
+            <th>Planta</th>
+            <th>Fecha de fabricación</th>
+            <th>Cantidad de Lavadas</th>
+            <th>Talla</th>
+            <th>Parámetros</th>
+            <th>Observaciones</th>
+            <th>Índice Microbiológico</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pechera in latest_pecheras %}
+            <tr>
+              <td><a href="{% url 'lectura' %}?id={{pechera.id_pechera|urlencode}}">{{ pechera.id_pechera }}</a></td>
+              <td>{{ pechera.get_planta_display }}</td>
+              <td>{{ pechera.fecha_fabricacion }}</td>
+              <td>{{ pechera.cantidad_lavados }}</td>
+              <td>{{ pechera.talla }}</td>
+              <td>{{ pechera.get_parameters_display }}</td>
+              <td>{{ pechera.observaciones }}</td>
+              <td>
+                {% if pechera.indice_microbiologico == 'No' %}
+                  <span class="text-danger">No</span>
+                  <i class="fas fa-exclamation-triangle text-danger"></i> <!-- Vector de peligro -->
+                {% elif pechera.indice_microbiologico == 'Si' %}
+                  <span class="text-success">Sí</span>
+                  <i class="fas fa-check-circle text-success"></i> <!-- Vector de aprobado -->
+                {% else %}
+                  <span class="text-warning">Valor no reconocido: {{ pechera.indice_microbiologico }}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  
+  {% endblock %}
+</div>
+
+

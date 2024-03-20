@@ -1,0 +1,73 @@
+{% extends 'app/base.html' %} {% load static %}
+
+<head>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+</head>
+
+{% block contenido %}
+
+<div>
+  <div class="row" style="display: flex;  align-items: center;">
+    <div class="col-sm-10 mb-3">
+      <h1>Lectura de datos</h1>
+      <Spam>Leer la información de una pechera</Spam>
+    </div>
+    <div class="col-sm-2 mb-3">
+      <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_rfid' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
+    </div>
+  </div><br>
+
+  <div class="card" >
+    <div class="card-header">
+      <div class="row" style="display: flex; justify-content: center; align-items: center;">
+        <div class="col-sm-10">Datos de la pechera</div>
+        <div class="col-sm-2">{% if pechera %}<a class="btn btn-primary btn-block" href="{% url 'editar' %}?id={{pechera.id_pechera|urlencode}}" role="button" style="margin-left: auto;" id="hide-mobile">Editar</a>{% endif %}</div> 
+      </div>       
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Identificador:</b></div><div class="col-sm">{{ pechera.id_pechera }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Planta:</b></div><div class="col-sm">{{ pechera.get_planta_display }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Fecha de fabricación:</b></div><div class="col-sm">{{ pechera.fecha_fabricacion }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Cantidad de Lavados:</b></div><div class="col-sm">{{ pechera.cantidad_lavados }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Talla:</b></div><div class="col-sm">{{ pechera.talla }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Parámetros:</b></div><div class="col-sm">{{ pechera.get_parameters_display }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Observaciones:</b></div><div class="col-sm">{{ pechera.observaciones }}</div></div></li>
+      <li class="list-group-item"><div class="row"><div class="col-sm"><b>Índice Microbiológico:</b></div><div class="col-sm">{{ pechera.indice_microbiologico }}</div></div></li>
+    </ul>
+  </div>
+  <br>
+  {% if pechera %}
+  <a class="btn btn-primary btn-block mb-4" href="{% url 'editar' %}?id={{pechera.id_pechera|urlencode}}" role="button" style="margin-left: auto;" id="show-mobile">Editar</a>
+  <div class="card">
+    <div class="card-header" style="display: flex;  align-items: center; justify-content: space-between">
+      Historial de lavados
+    </div>
+    <div class="card-body">
+      <table class="table table-responsive-sm table-fluid">
+        <thead>
+          <tr>
+            <th>Nº de lavado</th>
+            <th>Fecha de lavado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lavado in lista_lavados %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ lavado.fecha_lavado }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br>
+  {% endif %}  
+</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,53 @@
+{% extends 'app/base.html' %}
+
+{% load static %}
+
+{% block contenido %}
+
+<div class="container">
+    <h1 class="mt-4 mb-4">Datos pechera</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_pechera">ID Pechera:</label>
+            <input type="text" id="id_pechera" name="id_pechera" value="{{ form.instance.id_pechera }}" readonly class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="fecha_fabricacion">Fecha de Fabricación:</label>
+            {{ form.fecha_fabricacion }}
+        </div>
+        <div class="form-group">
+            <label for="planta">Planta:</label>
+            {{ form.planta }}
+        </div>
+        <div class="form-group">
+            <label for="talla">Talla:</label>
+            {{ form.talla }}
+        </div>
+        <div class="form-group">
+            <label for="cantidad_lavados">Cantidad de Lavados:</label>
+            {{ form.cantidad_lavados }}
+        </div>
+        <div class="form-group">
+            <label for="parameters">Parámetros:</label>
+            {{ form.parameters }}
+        </div>
+        <div class="form-group">
+            <label for="indice_microbiologico">Índice Microbiológico:</label>
+            {{ form.indice_microbiologico }}
+        </div>
+        <div class="form-group">
+            <label for="observaciones">Observaciones:</label>
+            {{ form.observaciones }}
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+
+    {% if error_message %}
+    <div class="alert alert-danger mt-3">
+        {{ error_message }}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

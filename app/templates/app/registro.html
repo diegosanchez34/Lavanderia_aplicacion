@@ -1,0 +1,63 @@
+{% extends 'app/base.html' %}
+
+
+{% load static %}
+
+{% block contenido %}
+
+<div>
+    <div class="row" style="display: flex;  align-items: center;">
+        <div class="col-sm-10 mb-3">
+          <h1>Registrar pechera</h1>
+          <Spam>Ingresar los datos de la nueva pechera a registrar</Spam>
+        </div>
+        <div class="col-sm-2 mb-3">
+            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_rfid' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
+        </div>
+      </div><br>
+
+    <form method="post" action="{% if form.instance.id_pechera %}{% url 'registro_con_uid' rfid_data=form.instance.id_pechera %}{% else %}{% url 'registro' %}{% endif %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_pechera">ID Pechera:</label>
+            <input type="text" id="id_pechera" name="id_pechera" value="{{ form.instance.id_pechera }}" readonly class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="fecha_fabricacion">Fecha de Fabricación:</label><br>
+            {{ form.fecha_fabricacion }}
+        </div>
+        <div class="form-group">
+            <label for="planta">Planta:</label><br>
+            {{ form.planta }}
+        </div>
+        <div class="form-group">
+            <label for="talla">Talla:</label><br>
+            {{ form.talla}}
+        </div>
+        <div class="form-group">
+            <label for="cantidad_lavados">Cantidad de Lavados:</label><br>
+            {{ form.cantidad_lavados }}
+        </div>
+        <div class="form-group">
+            <label for="parameters">Parámetros:</label><br>
+            {{ form.parameters }}
+        </div>
+        <div class="form-group">
+            <label for="indice_microbiologico">Índice Microbiológico:</label><br>
+            {{ form.indice_microbiologico }}
+        </div>
+        <div class="form-group">
+            <label for="observaciones">Observaciones:</label><br>
+            {{ form.observaciones}}
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Guardar</button><br><br>
+    </form>
+
+    {% if error_message %}
+    <div class="alert alert-danger mt-3">
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'app/base.html' %} {% load static %}
+
+<head>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+  />
+</head>
+
+{% block contenido %}
+
+<div>
+  <h1>Buscar pechera por UID</h1>
+
+  <form method="post" action="{% url 'listado' %}">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Buscar</button>
+  </form>
+  <br>
+  {% if pechera %}
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID Pechera</th>
+          <th>Fecha de Fabricación</th>
+          <th>Talla</th>
+          <th>Cantidad de Lavados</th>
+          <th>Observaciones</th>
+          <th>Planta</th>
+          <th>Parámetros</th>
+          <th>Índice Microbiológico</th>
+          <th>Eliminar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ pechera.id_pechera }}</td>
+          <td>{{ pechera.fecha_fabricacion }}</td>
+          <td>{{ pechera.talla }}</td>
+          <td>{{ pechera.cantidad_lavados }}</td>
+          <td>{{ pechera.observaciones }}</td>
+          <td>{{ pechera.get_planta_display }}</td>
+          <td>{{ pechera.get_parameters_display }}</td>
+          <td>{{ pechera.indice_microbiologico }}</td>
+          <td>
+            {% if pechera.eliminada %}
+            <!-- Muestra una alerta si la pechera está marcada como eliminada -->
+            <span class="badge badge-danger">¡Eliminada!</span>
+            {% else %}
+            <!-- Muestra el botón para eliminar la pechera -->
+            <a
+              href="{% url 'post-registro' rfid_data=pechera.id_pechera %}"
+              class="btn btn-danger"
+              >Eliminar</a
+            >
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+   
+  {% endif %}
+  
+  {% endblock %}
+</div>
+
+
