@@ -11,16 +11,16 @@ PARAMETERS_CHOICES = [
     ('4', 'Desgastada'),
 ]
 
-PLANTA_CHOICES = [
-    ('Planta0', 'Sin asignar'),
-    ('Planta1', 'ABICK S.A'),
-    ('Planta2', 'CONTINENTALES SPA'),
-    ('Planta3', 'CUTTER S.A'),
-    ('Planta4', 'OCEAN BLUE SPA'),
-    ('Planta5', 'PESQUERA DEL MAR ANTARTICO S.A'),
-    ('Planta6', 'PROCESOS FILETES DEL SUR SPA'),
-    ('Planta7', 'RIO YELCHO SPA'),
-    ('Planta8', 'RIO BLANCO'),
+PLANTAS_CHOICES = [
+    (1, 'Sin asignar'),
+    (2, 'ABICK S.A'),
+    (3, 'CONTINENTALES SPA'),
+    (4, 'CUTTER S.A'),
+    (5, 'OCEAN BLUE SPA'),
+    (6, 'PESQUERA DEL MAR ANTARTICO S.A'),
+    (7, 'PROCESOS FILETES DEL SUR SPA'),
+    (8, 'RIO YELCHO SPA'),
+    (9, 'RIO BLANCO'),
 ]
 
 OPCIONES_INDICE = [
@@ -34,7 +34,7 @@ class Pechera(models.Model):
     talla = models.CharField(max_length=5)
     cantidad_lavados = models.IntegerField(default=0)
     observaciones = models.CharField(max_length=500, blank=True)
-    planta = models.CharField(max_length=50, choices=PLANTA_CHOICES, default='Planta0')
+    planta = models.IntegerField (choices=PLANTAS_CHOICES,default=1)
     parameters = models.CharField(max_length=50, choices=PARAMETERS_CHOICES, default='1')
     indice_microbiologico = models.CharField(max_length=2, choices=OPCIONES_INDICE, default='Si', verbose_name="Índice Microbiológico")
     eliminada = models.BooleanField(default=False)
@@ -46,3 +46,9 @@ class Lavado(models.Model):
     id_lavado = models.AutoField(primary_key=True, unique=True)
     id_pechera = models.CharField(max_length=100,null=True)
     fecha_lavado = models.DateField(null=True)
+
+class Planta(models.Model):
+    id_planta = models.AutoField(primary_key=True, unique=True)
+    nombre = models.CharField(max_length=50,null=True)
+    cantidad = models.IntegerField (default=0)
+    kilos = models.IntegerField (default=0)

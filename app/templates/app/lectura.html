@@ -1,4 +1,6 @@
-{% extends 'app/base.html' %} {% load static %}
+{% extends 'app/base.html' %} 
+
+{% load static %}
 
 <head>
   <link
@@ -16,9 +18,15 @@
       <Spam>Leer la información de una pechera</Spam>
     </div>
     <div class="col-sm-2 mb-3">
-      <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_rfid' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
+      <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
     </div>
   </div><br>
+
+  {% if alerta %}
+  <div class="alert alert-warning" role="alert">
+    {{alerta}}
+  </div>
+  {% endif %}
 
   <div class="card" >
     <div class="card-header">

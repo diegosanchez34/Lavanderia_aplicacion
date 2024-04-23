@@ -20,61 +20,30 @@
   </div><br> 
    
   <div class="card mb-4">    
-      <div class="card-body">
-        <table class="table table-responsive-sm table-fluid">
-          <thead>
+    <div class="card-body">
+      <table class="table table-responsive-sm table-fluid">
+        <thead>
+          <tr>
+            <th>Nombre Planta</th>
+            <th>Cantidad de Pecheras</th>
+            <th>Cantidad de Plástico</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for planta in plantas %}
+          {% if planta.id_planta != 1 %}
             <tr>
-              <th>Nombre Planta</th>
-              <th>Cantidad de Pecheras</th>
-              <th>Cantidad de Plástico</th>
+              <td>{{ planta.nombre }}</td>
+              <td>{{ planta.cantidad }}</td>
+              <td>{{ planta.kilos }} Kg</td>
             </tr>
-          </thead>
-          <tbody>
-              <tr>
-                <td>ABICK S.A</td>
-                <td>{{abick }}</td>
-                <td>{{kg_abick}} Kg</td>
-              </tr>
-              <tr>
-                <td>CONTINENTALES SPA</td>
-                <td>{{continentales }}</td>
-                <td>{{kg_continentales}} Kg</td>
-              </tr>
-              <tr>
-                <td>CUTTER S.A</td>
-                <td>{{cutter }}</td>
-                <td>{{kg_cutter}} Kg</td>
-              </tr>
-              <tr>
-                <td>OCEAN BLUE SPA</td>
-                <td>{{ocean }}</td>
-                <td>{{kg_ocean}} Kg</td>
-              </tr>
-              <tr>
-                <td>PESQUERA DEL MAR ANTARTICO S.A</td>
-                <td>{{antartico }}</td>
-                <td>{{kg_antartico}} Kg</td>
-              </tr>
-              <tr>
-                <td>PROCESOS FILETES DEL SUR SPA</td>
-                <td>{{filetes }}</td>
-                <td>{{kg_filetes}} Kg</td>
-              </tr>
-              <tr>
-                <td>RIO YELCHO SPA</td>
-                <td>{{yelcho }}</td>
-                <td>{{kg_yelcho}} Kg</td>
-              </tr>
-              <tr>
-                <td>RIO BLANCO</td>
-                <td>{{blanco }}</td>
-                <td>{{kg_blanco}} Kg</td>
-              </tr>
-          </tbody>
-        </table>
-      </div>
-
+          {% endif %}
+          {% endfor %} 
+        </tbody>
+      </table>
+    </div>
   </div>
+
   
   {% endblock %}
 </div>

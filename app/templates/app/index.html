@@ -9,7 +9,7 @@
 
   <div class="row">
     <div class="col-sm-3 mb-3"><a class="btn btn-primary btn-block btn-lg" href="{% url 'lectura' %}" role="button"><img src="{% static 'app\img\lecturaw.svg' %}" width="23" alt="icono lavado" id="iconow"> Leer datos de pechera</a></div>
-    <div class="col-sm-3 mb-3"><a class="btn btn-primary btn-block btn-lg" href="{% url 'registro' %}" role="button"><img src="{% static 'app\img\plusw.svg' %}" width="20" alt="icono lavado" id="iconow"> Ingresar nueva pechera</a></div>
+    <div class="col-sm-3 mb-3"><a class="btn btn-primary btn-block btn-lg" href="{% url 'ingreso' %}" role="button"><img src="{% static 'app\img\plusw.svg' %}" width="20" alt="icono lavado" id="iconow"> Ingresar nueva pechera</a></div>
     <div class="col-sm-3 mb-3"><a class="btn btn-primary btn-block btn-lg" href="{% url 'lavado' %}" role="button"><img src="{% static 'app\img\lavadow.svg' %}" width="25" alt="icono lavado" id="iconow"> Registrar lavado pechera</a></div>
     <div class="col-sm-3 mb-3"><a class="btn btn-danger btn-block btn-lg" href="{% url 'eliminar' %}" role="button"><img src="{% static 'app\img\eliminarw.svg' %}" height="25" alt="icono eliminar" id="iconow"> Eliminar pechera</a></div>
   </div>
@@ -21,7 +21,7 @@
         <div class="card-body">
           <img src="{% static 'app\img\fabricadas.svg' %}" width="90" alt="fabricadas" style="float: right;">
           <h2 class="card-title">{{ manufactured_last_year }}</h2>
-          <p class="card-text">En el ulimo año</p>
+          <p class="card-text">En el último año</p>
         </div>
       </div>
     </div>
@@ -32,7 +32,7 @@
         <div class="card-body">
           <img src="{% static 'app\img\fabricadas.svg' %}" width="90" alt="fabricadas" style="float: right;">
           <h2 class="card-title">{{ manufactured_last_month }}</h2>
-          <p class="card-text">En el ulimo mes</p>
+          <p class="card-text">En el último mes</p>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <div class="card-body">
           <img src="{% static 'app\img\lavadas.svg' %}" width="90" alt="lavadas" style="float: right;">
           <h2 class="card-title">{{ washed_last_month }}</h2>
-          <p class="card-text">En el ulimo mes</p>
+          <p class="card-text">En el último mes</p>
         </div>
       </div>
     </div>
@@ -133,7 +133,5 @@
     </div>
   </div>
   <a class="btn btn-success btn-block" href="{% url 'exportar_a_excel' %}" role="button" style="margin-left: auto;" id="show-mobile">Descargar a Excel</a>
-  <br>
-  <a class="btn btn-primary" href="{% url 'leer_rfid' %}" role="button">Comenzar lectura</a><br><br>
 
 {% endblock %}
