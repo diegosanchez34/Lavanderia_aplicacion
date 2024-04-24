@@ -17,7 +17,15 @@
         <div class="form-group">
             <label for="id_pechera">ID Pechera:</label>
             <input type="text" id="id_pechera" name="id_pechera" value="{{ pechera.id_pechera }}" readonly class="form-control">
-        </div>
+        </div>    
+        <div class="form-group">
+            <label for="fecha_fabricacion">Fecha de Fabricación:</label><br>
+            <input type="date" id="fecha_fabricacion" name="fecha_fabricacion" value="{{ pechera.fecha_fabricacion|date:'Y-m-d' }}" readonly class="form-control">
+        </div>    
+        <div class="form-group">
+            <label for="fecha_fabricacion">Cantidad de lavados:</label><br>
+            <input type="number" id="cantidad_lavados" name="cantidad_lavados" value="{{ pechera.cantidad_lavados }}" readonly class="form-control">
+        </div>        
         <div class="form-group">
             <label for="plantas">Planta: </label>            
             <select class="form-select form-control d-inline-block mr-2" id="planta" name="planta">
@@ -25,15 +33,7 @@
                     <option value="{{ planta.id_planta }}" {% if planta.id_planta == pechera.planta %} selected {% endif %}>{{ planta.nombre }}</option>
                 {% endfor %}                
             </select>
-        </div>
-        <div class="form-group">
-            <label for="fecha_fabricacion">Fecha de Fabricación:</label><br>
-            <input type="date" id="fecha_fabricacion" name="fecha_fabricacion" value="{{ pechera.fecha_fabricacion|date:'Y-m-d' }}" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="fecha_fabricacion">Cantidad de lavados:</label><br>
-            <input type="number" id="cantidad_lavados" name="cantidad_lavados" value="{{ pechera.cantidad_lavados }}" readonly class="form-control">
-        </div>
+        </div>        
         <div class="form-group">
             <label for="talla">Talla:</label><br>
             <input type="text" id="talla" name="talla" value="{{ pechera.talla }}" class="form-control">

@@ -15,6 +15,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from django.http import JsonResponse
+from datetime import date
 
 # Create your views here.
 
@@ -90,30 +91,61 @@ def plantas(request):
 
     return render(request, 'app/plantas.html', context)
 
+def leer_ingreso(request):
+    arduino_port = 'COM4'
+    baud_rate = 9600
+    arduino = None
 
-def registro(request):
-    error_message = None
-    rfid_data = request.POST.get('rfid_data')
+    try:
+        arduino = serial.Serial(arduino_port, baud_rate)
+        while True:
+            rfid_data_full = arduino.readline().decode().strip()
+            # Verificar si el valor es "Listo para leer etiquetas RFID..."
+            if rfid_data_full != "Listo para leer etiquetas RFID...":
+                # Extraer el UID eliminando el texto no deseado
+                prefix = "Número de serie de la tarjeta RFID:"
+                if rfid_data_full.startswith(prefix):
+                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
+                else:
+                    rfid_data = rfid_data_full.replace(" ", "")
 
-    if request.method == 'POST':
-        form = FormPechera(request.POST)
-        if form.is_valid():
-            # Guardar los datos en la base de datos
-            form.save()
-            return redirect('index')
-        else:
-            error_message = "Hubo un error al guardar los datos"
-    else:
-        form = FormPechera(initial={'id_pechera': rfid_data})
+                if rfid_data:                    
+                    print("RFID TAG: ", rfid_data)
 
-    return render(request, 'app/registro.html', {'form': form, 'error_message': error_message, 'rfid_data': rfid_data})
+                    # Verificar si el UID ya existe en la base de datos
+                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
 
+                    if existing_pechera:
+                        # Notificar al usuario
+                        print("UID ya existe en la base de datos")
+                        return redirect('ingreso_alerta',alerta="1")
+                    else:
+                        # Notificar al usuario
+                        print("UID no registrado en la base de datos")
 
-def ingreso(request):   
-    pechera = None  # Inicialmente, no se muestra ninguna pechera
+                        # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
+                        url = reverse('ingreso') + f'?id={rfid_data}'
+
+                        # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
+                        return redirect(url)            
+
+    except KeyboardInterrupt:
+        print("Lectura de RFID detenida.")
+    except Exception as e:
+        print("Error: ", e)
+    finally:
+        if arduino is not None:
+            arduino.close()
+
+    return HttpResponse("Lectura RFID completada.")
+
+def ingreso(request):  
+    fecha_actual = date.today()
+    id_pechera = " "
+
     if request.method == 'GET':
-        id_pechera = request.GET.get("id")
-        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
+        if request.GET.get("id") != None:
+            id_pechera = request.GET.get("id")
 
     # Obtener todas las plantas
     plantas = Planta.objects.all()
@@ -125,13 +157,55 @@ def ingreso(request):
     ('4', 'Desgastada'),]
 
     opciones_indice = [('Si'),('No'),]
-    context = {'pechera': pechera, 'plantas': plantas, 'parameters_choices': parameters_choices,'opciones_indice': opciones_indice}
+
+    context = {'fecha_actual':fecha_actual, 'id_pechera':id_pechera,'plantas': plantas, 'parameters_choices': parameters_choices,'opciones_indice': opciones_indice}
+    return render(request, 'app/ingreso.html', context)
+
+def ingreso_alerta(request,alerta):   
+    fecha_actual = date.today()
+    alerta = alerta
+    id_pechera = " "
+
+    if request.method == 'GET':
+        if request.GET.get("id") != None:
+            id_pechera = request.GET.get("id")
+
+    # Obtener todas las plantas
+    plantas = Planta.objects.all()
+
+    parameters_choices = [
+    ('1', 'Nuevo'),
+    ('2', 'Perfectas condiciones'),
+    ('3', 'Ligermante desgastanda'),
+    ('4', 'Desgastada'),]
+
+    opciones_indice = [('Si'),('No'),]
+
+    context = {'fecha_actual':fecha_actual,'id_pechera':id_pechera, 'plantas': plantas, 'parameters_choices': parameters_choices,'opciones_indice': opciones_indice,'alerta':alerta}
     return render(request, 'app/ingreso.html', context)
 
 
 def guardar(request):
-    alerta = "Error al intentar ingresar la pechera"
-    return render(request, 'app/ingreso.html',  {'alerta':alerta})
+    id_pechera = request.POST['id_pechera']
+
+    if id_pechera == " ":  
+        return redirect('ingreso_alerta',alerta="2")
+    else:
+        existing_pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
+        if existing_pechera:
+            return redirect('ingreso_alerta',alerta="1")
+        else:
+            Pechera.objects.create(
+                id_pechera = id_pechera,
+                fecha_fabricacion = request.POST['fecha_fabricacion'],
+                talla = request.POST['talla'],
+                observaciones = request.POST['observaciones'],
+                planta = request.POST['planta'],
+                parameters = request.POST['parameters'],
+                indice_microbiologico = request.POST['indice_microbiologico']
+                )
+            print("Pechera creada con exito")
+            return redirect('ingreso_alerta',alerta="3")
 
 
 def editar(request):
@@ -157,10 +231,7 @@ def editar(request):
 def actualizar(request):
     pechera = Pechera.objects.filter(id_pechera=request.POST['id_pechera']).first()
     if pechera:
-        pechera.id_pechera = request.POST['id_pechera']
-        pechera.fecha_fabricacion = request.POST['fecha_fabricacion']
         pechera.talla = request.POST['talla']
-        pechera.cantidad_lavados = request.POST['cantidad_lavados']
         pechera.observaciones = request.POST['observaciones']
         pechera.planta = request.POST['planta']
         pechera.parameters = request.POST['parameters']
@@ -174,7 +245,6 @@ def leer(request):
     arduino_port = 'COM4'
     baud_rate = 9600
     arduino = None
-    alerta = "False"
 
     try:
         arduino = serial.Serial(arduino_port, baud_rate)
@@ -206,7 +276,6 @@ def leer(request):
                     else:
                         # Notificar al usuario
                         print("UID no registrado en la base de datos")
-                        alerta = "True"
                         return redirect('lectura_alerta')            
 
     except KeyboardInterrupt:
@@ -219,97 +288,31 @@ def leer(request):
 
     return HttpResponse("Lectura RFID completada.")
 
-def leer_rfid(request):
-    arduino_port = 'COM4'
-    baud_rate = 9600
-    arduino = None
+def lectura(request): 
+    alerta = None  
+    pechera = None  # Inicialmente, no se muestra ninguna pechera
+    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
+    if request.method == 'GET':
+        id_pechera = request.GET.get("id")
+        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
+        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
 
-    try:
-        arduino = serial.Serial(arduino_port, baud_rate)
-        while True:
-            rfid_data_full = arduino.readline().decode().strip()
-            # Verificar si el valor es "Listo para leer etiquetas RFID..."
-            if rfid_data_full != "Listo para leer etiquetas RFID...":
-                # Extraer el UID eliminando el texto no deseado
-                prefix = "Número de serie de la tarjeta RFID:"
-                if rfid_data_full.startswith(prefix):
-                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
-                else:
-                    rfid_data = rfid_data_full.replace(" ", "")
+    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
 
-                if rfid_data:
-                    print("RFID TAG: ", rfid_data)
+    return render(request, 'app/lectura.html', context)
 
-                    # Verificar si el UID ya existe en la base de datos
-                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
-                    if existing_pechera:
-                        print("UID ya existe en la base de datos")
+def lectura_alerta(request):   
+    alerta = "UID no registrado en la base de datos"
+    pechera = None  # Inicialmente, no se muestra ninguna pechera
+    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
+    if request.method == 'GET':
+        id_pechera = request.GET.get("id")
+        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
+        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
 
-                        # Incrementar el campo cantidad_lavados en 1
-                        existing_pechera.cantidad_lavados += 1
-                        existing_pechera.save()
+    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
 
-                        print("cantidad_lavados incrementado a:", existing_pechera.cantidad_lavados)
-
-                        # Redirigir a la vista de post-registro
-                        return redirect('post-registro', rfid_data=rfid_data)
-                    else:
-                        # Guardar el UID en la base de datos
-                        Pechera.objects.create(id_pechera=rfid_data)
-                        print("UID guardado en la base de datos")
-
-                        # Redirigir a la vista de registro_con_uid con el UID leído
-                        return redirect('registro_con_uid', rfid_data=rfid_data)
-
-    except KeyboardInterrupt:
-        print("Lectura de RFID detenida.")
-    except Exception as e:
-        print("Error: ", e)
-    finally:
-        if arduino is not None:
-            arduino.close()
-
-    return HttpResponse("Lectura RFID completada.")
-
-
-def registro_con_uid(request, rfid_data):
-    pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
-
-    if pechera:
-        # Si el UID existe, redirige a la vista de post-registro
-        return redirect('post-registro', rfid_data=rfid_data)
-    else:
-        # Si el UID no existe, muestra el formulario de registro con el UID
-        if request.method == 'POST':
-            form = FormPechera(request.POST, instance=pechera)
-            if form.is_valid():
-                form.save()  # Guarda los datos modificados o crea un nuevo registro si es necesario
-                return redirect('index')
-        else:
-            form = FormPechera(instance=pechera, initial={'id_pechera': rfid_data})
-
-        return render(request, 'app/registro.html', {'form': form, 'rfid_data': rfid_data})
-
-def post_registro(request, rfid_data=None):
-    pechera = None
-
-    if rfid_data:
-        # Si se proporciona un RFID, intenta encontrar el registro correspondiente
-        pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
-
-    if request.method == 'POST':
-        form = FormPechera(request.POST, instance=pechera)
-        if form.is_valid():
-            # Actualiza el campo eliminada si la opción es 'Eliminar'
-            if form.cleaned_data['parameters'] == '5':
-                form.instance.eliminada = True
-            form.save()  # Guarda los datos modificados o crea un nuevo registro si es necesario
-            return redirect('index')
-    else:
-        form = FormPechera(instance=pechera, initial={'id_pechera': rfid_data})
-
-    return render(request, 'app/post-registro.html', {'form': form})
-
+    return render(request, 'app/lectura.html', context)
 
 def exportar_a_excel(request):
     # Obtén los datos de la base de datos
@@ -377,32 +380,6 @@ def exportar_a_excel(request):
     wb.save(response)
 
     return response
-
-def lectura(request): 
-    alerta = None  
-    pechera = None  # Inicialmente, no se muestra ninguna pechera
-    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
-    if request.method == 'GET':
-        id_pechera = request.GET.get("id")
-        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
-        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
-
-    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
-
-    return render(request, 'app/lectura.html', context)
-
-def lectura_alerta(request):   
-    alerta = "UID no registrado en la base de datos"
-    pechera = None  # Inicialmente, no se muestra ninguna pechera
-    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
-    if request.method == 'GET':
-        id_pechera = request.GET.get("id")
-        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
-        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
-
-    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
-
-    return render(request, 'app/lectura.html', context)
 
 def lavado(request):    
     pechera = None  # Inicialmente, no se muestra ninguna pechera

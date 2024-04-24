@@ -12,55 +12,59 @@
           <Spam>Ingresar los datos de la nueva pechera a registrar</Spam>
         </div>
         <div class="col-sm-2 mb-3">
-            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
+            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_ingreso' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
         </div>
-      </div><br>
+    </div><br>
 
-    <h1>{{alerta}}</h1>
+    {% if alerta == "1" %}
+        <div class="alert alert-warning" role="alert">La pechera ya esta registrada</div>
+    {% endif %}
+    {% if alerta == "2" %}
+        <div class="alert alert-warning" role="alert">No se puede registrar pechera con ID vacio</div>
+    {% endif %}
+    {% if alerta == "3" %}
+        <div class="alert alert-success" role="alert">Pechera registrada con exito</div>
+    {% endif %}
       
     <form method="post" action="{% url 'guardar' %}">
         {% csrf_token %}
         <div class="form-group">
             <label for="id_pechera">ID Pechera:</label>
-            <input type="text" id="id_pechera" name="id_pechera" value="{{ pechera.id_pechera }}" readonly class="form-control">
+            <input type="text" id="id_pechera" name="id_pechera" value="{{ id_pechera }}" readonly class="form-control">
         </div>
         <div class="form-group">
             <label for="plantas">Planta: </label>            
             <select class="form-select form-control d-inline-block mr-2" id="planta" name="planta">
                 {% for planta in plantas %}
-                  <option value="{{ planta.id_planta }}" {% if planta.id_planta == pechera.planta %} selected {% endif %}>{{ planta.nombre }}</option>
+                  <option value="{{ planta.id_planta }}">{{ planta.nombre }}</option>
                 {% endfor %}                
             </select>
         </div>
         <div class="form-group">
             <label for="fecha_fabricacion">Fecha de Fabricación:</label><br>
-            <input type="date" id="fecha_fabricacion" name="fecha_fabricacion" value="{{ pechera.fecha_fabricacion|date:'yy-m-d' }}" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="fecha_fabricacion">Cantidad de lavados:</label><br>
-            <input type="number" id="cantidad_lavados" name="cantidad_lavados" value="{{ pechera.cantidad_lavados }}" readonly class="form-control">
+            <input type="date" id="fecha_fabricacion" name="fecha_fabricacion" value="{{ fecha_actual|date:'Y-m-d' }}" class="form-control">
         </div>
         <div class="form-group">
             <label for="talla">Talla:</label><br>
-            <input type="text" id="talla" name="talla" value="{{ pechera.talla }}" class="form-control">
+            <input type="text" id="talla" name="talla" class="form-control">
         </div>
         <div class="form-group">
             <label for="parametro">Parámetros: </label>            
             <select class="form-select form-control d-inline-block mr-2" id="parameters" name="parameters">
                 {% for valor,parametro in parameters_choices %}
-                    <option value="{{ valor }}" {% if valor == pechera.parameters %} selected {% endif %}>{{ parametro }}</option>
+                    <option value="{{ valor }}" >{{ parametro }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="form-group">
             <label for="observaciones">Observaciones:</label><br>
-            <input type="text" id="observaciones" name="observaciones" value="{{ pechera.observaciones }}" class="form-control">
+            <input type="text" id="observaciones" name="observaciones" class="form-control">
         </div>
         <div class="form-group">
             <label for="indice">Índice Microbiológico:</label><br>
             <select class="form-select form-control d-inline-block mr-2" id="indice_microbiologico" name="indice_microbiologico">
                 {% for indice in opciones_indice %}
-                    <option value="{{ indice }}" {% if indice == pechera.indice_microbiologico %} selected {% endif %}>{{ indice }}</option>
+                    <option value="{{ indice }}">{{ indice }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -68,11 +72,5 @@
         <br>
         <button type="submit" class="btn btn-primary btn-block btn-lg">Guardar</button><br><br>
     </form>
-
-    {% if error_message %}
-    <div class="alert alert-danger mt-3">
-        {{ error_message }}
-    </div>
-    {% endif %}
 
 {% endblock %}
