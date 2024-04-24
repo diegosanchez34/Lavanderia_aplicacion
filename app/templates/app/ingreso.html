@@ -12,7 +12,7 @@
           <Spam>Ingresar los datos de la nueva pechera a registrar</Spam>
         </div>
         <div class="col-sm-2 mb-3">
-            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_ingreso' %}" role="button" style="margin-left: auto;">Comenzar lectura</a>
+            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_ingreso' %}" id="leyendo" role="button" style="margin-left: auto;">Comenzar lectura</a>
         </div>
     </div><br>
 
@@ -72,5 +72,16 @@
         <br>
         <button type="submit" class="btn btn-primary btn-block btn-lg">Guardar</button><br><br>
     </form>
+
+    <script>
+        // Obtén el botón por su ID
+        var miBoton = document.getElementById('leyendo');
+      
+        // Agrega un event listener para el evento 'click'
+        miBoton.addEventListener('click', function() {
+            // Cambia el texto del botón
+            miBoton.textContent = 'Leyendo información...';
+        });
+      </script>
 
 {% endblock %}

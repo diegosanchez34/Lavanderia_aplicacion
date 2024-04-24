@@ -17,7 +17,7 @@
     var icono1 = document.getElementById("off");
     var icono2 = document.getElementById("on");
     boton1.style.display ="none";
-    boton2.style.display ="block";
+    boton2.style.display ="block";    
     icono1.style.display ="none";
     icono2.style.display ="block";
 });
@@ -31,4 +31,9 @@ document.getElementById("detener").addEventListener("click", function() {
     boton2.style.display ="none";
     icono1.style.display ="block";
     icono2.style.display ="none";
+});
+
+document.getElementById("leyendo").addEventListener("click", function() {
+    var boton = document.getElementById("leyendo");
+    boton.textContent = 'Leyendo información..';
 });
