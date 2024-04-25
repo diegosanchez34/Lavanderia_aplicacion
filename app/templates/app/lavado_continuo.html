@@ -17,16 +17,14 @@
       <Spam>Agregar un nuevo ciclo de lavado y secado de pechera al sistema</Spam>
     </div>
     <div class="col-sm-2 mb-3">
-      <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_lavado' %}" role="button" id="leyendo" style="margin-left: auto;">Comenzar lectura</a>
+      <button class="btn btn-primary btn-block btn-lg" onclick="cambiarEstado()" id="boton" name="boton" style="margin-left: auto;">Comenzar lectura</button>
     </div>     
   </div><br>
 
-  {% if alerta %}
-  <div class="alert alert-warning" role="alert">
-    {{alerta}}
-  </div>
-  {% endif %}
-
+  <form method="post" action="{% url 'leer_lavado' %}" id="formulario">
+      {% csrf_token %}  
+      <input type="hidden" id="estado" name="estado" value="{{estado_actual}}">       
+  </form>
 
   <div class="row">
     <div class="col-sm-8 mb-8">
@@ -42,14 +40,6 @@
           <li class="list-group-item"><div class="row"><div class="col-sm"><b>Índice Microbiológico:</b></div><div class="col-sm">{{ pechera.indice_microbiologico }}</div></div></li>
         </ul>
       </div>
-      {% if pechera %}   
-      <form method="post" action="{% url 'registrar_lavado' %}" id="formulario"><br>
-          {% csrf_token %}  
-          <input type="hidden" id="id_pechera" name="id_pechera" value="{{pechera.id_pechera}}"> 
-          <input type="hidden" id="lavados" name="lavados" value="{{pechera.cantidad_lavados}}"> 
-          <button type="submit" class="btn btn-primary btn-block btn-lg">Registrar Lavado</button>     
-      </form>     
-      {% endif %}  
     </div>
     <div class="col-sm-4 mb-4">
       <div class="card border-0" >
@@ -59,18 +49,53 @@
     </div>
   </div><br>
 
-  <script>
-    var miBoton = document.getElementById('leyendo');
-    var icono1 = document.getElementById("off");
-    var icono2 = document.getElementById("on");
-  
-    miBoton.addEventListener('click', function() {
-        miBoton.textContent = 'Leyendo información...';
+  {% if estado_actual == "activado" %}
+    <script>
+        var formulario = document.getElementById('formulario');
+        var boton = document.getElementById('boton');
+        var icono1 = document.getElementById("off");
+        var icono2 = document.getElementById("on");     
+        boton.textContent  = 'Detener lectura'; 
+        boton.className = 'btn btn-danger btn-block btn-lg';  
         icono1.style.display ="none";
         icono2.style.display ="block";
-    });
-  </script>
+        formulario.submit(); 
+    </script>
+  {% endif %}
 
+  <script>
+    function cambiarEstado() {
+        var formulario = document.getElementById('formulario');
+        var estado = document.getElementById('estado');
+        var boton = document.getElementById('boton');
+        var icono1 = document.getElementById("off");
+        var icono2 = document.getElementById("on");
+
+        if (estado.value == "detenido") {   
+            estado.value = "activado";      
+            boton.textContent  = 'Detener lectura'; 
+            boton.className = 'btn btn-danger btn-block btn-lg';  
+            icono1.style.display ="none";
+            icono2.style.display ="block";
+            formulario.submit(); 
+        } else { 
+            estado.value = "detenido"; 
+            fetch('/detener_lectura/', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Proceso de lectura detenido');
+                } else {
+                    console.error('Error al detener el proceso de lectura');
+                }
+            })
+            .catch(error => {
+                console.error('Error al detener el proceso de lectura:', error);
+            });
+        }
+    }
+  </script>  
 </div>
 
 {% endblock %}

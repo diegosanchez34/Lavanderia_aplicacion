@@ -32,8 +32,3 @@ document.getElementById("detener").addEventListener("click", function() {
     icono1.style.display ="block";
     icono2.style.display ="none";
 });
-
-document.getElementById("leyendo").addEventListener("click", function() {
-    var boton = document.getElementById("leyendo");
-    boton.textContent = 'Leyendo información..';
-});
