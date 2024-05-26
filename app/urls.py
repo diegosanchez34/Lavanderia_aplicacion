@@ -3,8 +3,6 @@ from .views import *
 from django.conf.urls.static import static
 from django.conf import settings
 
-from app import views
-
 urlpatterns = [
     path('', index, name='index'),
     path('listado/', listado, name="listado" ),
@@ -21,7 +19,7 @@ urlpatterns = [
     path('editar/', editar, name='editar'),
     path('actualizar/', actualizar, name='actualizar'),
     path('plantas/', plantas, name='plantas'),
-    path('leer/', views.leer, name='leer'),
+    path('leer/', leer, name='leer'),
     path('leer_ingreso/', leer_ingreso, name='leer_ingreso'),
     path('leer_lavado/', leer_lavado, name='leer_lavado'),
     path('leer_eliminar/', leer_eliminar, name='leer_eliminar'),
