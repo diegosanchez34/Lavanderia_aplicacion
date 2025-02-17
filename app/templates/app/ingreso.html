@@ -1,19 +1,26 @@
 {% extends 'app/base.html' %}
 
-
 {% load static %}
 
 {% block contenido %}
 
 <div>
     <div class="row" style="display: flex;  align-items: center;">
-        <div class="col-sm-10 mb-3">
+        <div class="col-sm-9 mb-3">
           <h1>Registrar pechera</h1>
           <Spam>Ingresar los datos de la nueva pechera a registrar</Spam>
         </div>
-        <div class="col-sm-2 mb-3">
-            <a class="btn btn-primary btn-block btn-lg" href="{% url 'leer_ingreso' %}" id="leyendo" role="button" style="margin-left: auto;">Comenzar lectura</a>
+
+        <div class="col-sm-3 mb-3" >   
+            <form method="post" action="{% url 'leer_ingreso' %}" style="display: flex">
+              {% csrf_token %}                      
+              <input type="text" id="codigo" name="codigo" class="form-control" autofocus>
+              <button type="submit" class="btn btn-primary btn-block" style="flex: 1 0 25%; margin-left: 10px; ">
+                <span class="fa fa-search" aria-hidden="true"></span>
+              </button>         
+            </form> 
         </div>
+
     </div><br>
 
     {% if alerta == "1" %}

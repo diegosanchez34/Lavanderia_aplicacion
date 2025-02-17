@@ -94,6 +94,56 @@ def plantas(request):
 
     return render(request, 'app/plantas.html', context)
 
+def lectura(request): 
+    pechera = None  # Inicialmente, no se muestra ninguna pechera
+    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
+    if request.method == 'GET':
+        id_pechera = request.GET.get("id")
+        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
+        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
+        if pechera:
+            if pechera.eliminada:
+                return redirect('lectura_alerta') 
+
+    context = {'pechera': pechera, "lista_lavados":lista_lavados}
+
+    return render(request, 'app/lectura.html', context)
+
+def lectura_alerta(request):   
+    alerta = "UID no registrado en la base de datos"
+    pechera = None  # Inicialmente, no se muestra ninguna pechera
+    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
+    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
+    return render(request, 'app/lectura.html', context)
+
+def buscar_pechera(request):
+    if request.method == 'POST':
+        codigo_barra = request.POST.get('codigo')
+
+        if codigo_barra:
+            print("CÓDIGO DE BARRAS: ", codigo_barra)
+
+            # Verificar si el UID ya existe en la base de datos
+            existing_pechera = Pechera.objects.filter(id_pechera=codigo_barra).first()
+
+            if existing_pechera:
+                print("UID ya existe en la base de datos")
+
+                # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
+                url = reverse('lectura') + f'?id={codigo_barra}'
+
+                # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
+                return redirect(url)
+            else:
+                # Notificar al usuario
+                print("UID no registrado en la base de datos")
+                return redirect('lectura_alerta')
+        else:
+            print("No se ha ingresado ningún código de barras.")
+            return redirect('lectura_alerta')  # O redirige a donde consideres apropiado
+
+    return render(request, 'lectura.html')  # Renderiza la página de lectura si no es una solicitud POST
+
 def ingreso(request):  
     fecha_actual = date.today()
     id_pechera = " "
@@ -136,53 +186,33 @@ def ingreso_alerta(request,alerta):
     return render(request, 'app/ingreso.html', context)
 
 def leer_ingreso(request):
-    arduino_port = 'COM4'
-    baud_rate = 9600
-    arduino = None
+    if request.method == 'POST':
+        codigo_barra = request.POST.get('codigo')
 
-    try:
-        arduino = serial.Serial(arduino_port, baud_rate)
-        while True:
-            rfid_data_full = arduino.readline().decode().strip()
-            # Verificar si el valor es "Listo para leer etiquetas RFID..."
-            if rfid_data_full != "Listo para leer etiquetas RFID...":
-                # Extraer el UID eliminando el texto no deseado
-                prefix = "Número de serie de la tarjeta RFID:"
-                if rfid_data_full.startswith(prefix):
-                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
-                else:
-                    rfid_data = rfid_data_full.replace(" ", "")
+        if codigo_barra:
+            print("CÓDIGO DE BARRAS: ", codigo_barra)
 
-                if rfid_data:                    
-                    print("RFID TAG: ", rfid_data)
+            # Verificar si el UID ya existe en la base de datos
+            existing_pechera = Pechera.objects.filter(id_pechera=codigo_barra).first()
 
-                    # Verificar si el UID ya existe en la base de datos
-                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
+            if existing_pechera:
+                # Notificar al usuario
+                print("UID ya existe en la base de datos")
+                return redirect('ingreso_alerta', alerta="1")
+            else:
+                # Notificar al usuario
+                print("UID no registrado en la base de datos")
 
-                    if existing_pechera:
-                        # Notificar al usuario
-                        print("UID ya existe en la base de datos")
-                        return redirect('ingreso_alerta',alerta="1")
-                    else:
-                        # Notificar al usuario
-                        print("UID no registrado en la base de datos")
+                # Generar la URL de la página 'ingreso' con el ID de la pechera como parámetro
+                url = reverse('ingreso') + f'?id={codigo_barra}'
 
-                        # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
-                        url = reverse('ingreso') + f'?id={rfid_data}'
+                # Redirigir a la página 'ingreso' con el ID de la pechera como parámetro en la URL
+                return redirect(url)
+        else:
+            print("No se ha ingresado ningún código de barras.")
+            return redirect('ingreso_alerta', alerta="2")  # Alerta diferente si no hay código
 
-                        # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
-                        return redirect(url)            
-
-    except KeyboardInterrupt:
-        print("Lectura de RFID detenida.")
-    except Exception as e:
-        print("Error: ", e)
-    finally:
-        if arduino is not None:
-            arduino.close()
-
-    return HttpResponse("Error en la lectura de datos, retroseda y recargue la pagina. IMPORTANTE: verifique que el dispositivo pueda leer información antes de comenzar la lectura.")
-
+    return render(request, 'ingreso.html')  # Renderiza la página de ingreso si no es POST
 
 def guardar(request):
     id_pechera = request.POST['id_pechera']
@@ -205,75 +235,6 @@ def guardar(request):
                 )
             print("Pechera creada con exito")
             return redirect('ingreso_alerta',alerta="3")
-
-def lectura(request): 
-    pechera = None  # Inicialmente, no se muestra ninguna pechera
-    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
-    if request.method == 'GET':
-        id_pechera = request.GET.get("id")
-        pechera = Pechera.objects.filter(id_pechera=id_pechera).first()
-        lista_lavados = Lavado.objects.filter(id_pechera=id_pechera)[:]
-        if pechera:
-            if pechera.eliminada:
-                return redirect('lavado_alerta') 
-
-    context = {'pechera': pechera, "lista_lavados":lista_lavados}
-
-    return render(request, 'app/lectura.html', context)
-
-def lectura_alerta(request):   
-    alerta = "UID no registrado en la base de datos"
-    pechera = None  # Inicialmente, no se muestra ninguna pechera
-    lista_lavados = None  # Inicialmente, no se muestra ninguna pechera
-    context = {'pechera': pechera, "lista_lavados":lista_lavados, 'alerta': alerta}
-    return render(request, 'app/lectura.html', context)
-
-def leer(request):
-    arduino_port = 'COM4'
-    baud_rate = 9600
-    arduino = None
-
-    try:
-        arduino = serial.Serial(arduino_port, baud_rate)
-        while True:
-            rfid_data_full = arduino.readline().decode().strip()
-            # Verificar si el valor es "Listo para leer etiquetas RFID..."
-            if rfid_data_full != "Listo para leer etiquetas RFID...":
-                # Extraer el UID eliminando el texto no deseado
-                prefix = "Número de serie de la tarjeta RFID:"
-                if rfid_data_full.startswith(prefix):
-                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
-                else:
-                    rfid_data = rfid_data_full.replace(" ", "")
-
-                if rfid_data:                    
-                    print("RFID TAG: ", rfid_data)
-
-                    # Verificar si el UID ya existe en la base de datos
-                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
-
-                    if existing_pechera:
-                        print("UID ya existe en la base de datos")
-
-                        # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
-                        url = reverse('lectura') + f'?id={rfid_data}'
-
-                        # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
-                        return redirect(url)
-                    else:
-                        # Notificar al usuario
-                        print("UID no registrado en la base de datos")
-                        return redirect('lectura_alerta')            
-
-    except KeyboardInterrupt:
-        print("Lectura de RFID detenida.")
-    except Exception as e:
-        print("Error: ", e)
-    finally:
-        if arduino is not None:
-            arduino.close()
-
-    return HttpResponse("Error en la lectura de datos, retroseda y recargue la pagina. IMPORTANTE: verifique que el dispositivo pueda leer información antes de comenzar la lectura.")
 
 def editar(request):
     pechera = None
@@ -394,53 +355,32 @@ def lavado_alerta(request):
     context = {'pechera': pechera, 'alerta': alerta}
     return render(request, 'app/lavado.html', context)
 
-def leer_lavado(request):    
-    arduino_port = 'COM4'
-    baud_rate = 9600
-    arduino = None
-    
-    try:
-        arduino = serial.Serial(arduino_port, baud_rate)
-        
-        while True:
-            rfid_data_full = arduino.readline().decode().strip()
-            # Verificar si el valor es "Listo para leer etiquetas RFID..."
-            if rfid_data_full != "Listo para leer etiquetas RFID...":
-                # Extraer el UID eliminando el texto no deseado
-                prefix = "Número de serie de la tarjeta RFID:"
-                if rfid_data_full.startswith(prefix):
-                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
-                else:
-                    rfid_data = rfid_data_full.replace(" ", "")
+def leer_lavado(request):
+    if request.method == 'POST':
+        codigo_barra = request.POST.get('codigo')
 
-                if rfid_data:                    
-                    print("RFID TAG: ", rfid_data)
+        if codigo_barra:
+            print("CÓDIGO DE BARRAS: ", codigo_barra)
 
-                    # Verificar si el UID ya existe en la base de datos
-                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
+            # Verificar si el UID ya existe en la base de datos
+            existing_pechera = Pechera.objects.filter(id_pechera=codigo_barra).first()
 
-                    if existing_pechera:
-                        print("UID ya existe en la base de datos")
+            if existing_pechera:
+                print("UID ya existe en la base de datos")
 
-                        # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
-                        url = reverse('lavado') + f'?id={rfid_data}'
+                # Generar la URL de la página 'lavado' con el ID de la pechera como parámetro
+                url = reverse('lavado') + f'?id={codigo_barra}'
 
-                        # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
-                        return redirect(url)
-                    else:
-                        # Notificar al usuario
-                        print("UID no registrado en la base de datos")
-                        return redirect('lavado_alerta')            
+                # Redirigir a la página 'lavado' con el ID de la pechera como parámetro en la URL
+                return redirect(url)
+            else:
+                print("UID no registrado en la base de datos")
+                return redirect('lavado_alerta')
+        else:
+            print("No se ha ingresado ningún código de barras.")
+            return redirect('lavado_alerta')
 
-    except KeyboardInterrupt:
-        print("Lectura de RFID detenida.")
-    except Exception as e:
-        print("Error: ", e)
-    finally:
-        if arduino is not None:
-            arduino.close()
-
-    return HttpResponse("Error en la lectura de datos, retroseda y recargue la pagina. IMPORTANTE: verifique que el dispositivo pueda leer información antes de comenzar la lectura.")   
+    return render(request, 'lavado.html')  # Renderiza la página de lavado si no es POST
 
 def registrar_lavado(request):
     pechera = None
@@ -473,53 +413,31 @@ def eliminar_alerta(request):
     context = {'pechera': pechera, 'alerta': alerta}
     return render(request, 'app/eliminar.html', context)
 
-def leer_eliminar(request):    
-    arduino_port = 'COM4'
-    baud_rate = 9600
-    arduino = None
-    
-    try:
-        arduino = serial.Serial(arduino_port, baud_rate)
-        
-        while True:
-            rfid_data_full = arduino.readline().decode().strip()
-            # Verificar si el valor es "Listo para leer etiquetas RFID..."
-            if rfid_data_full != "Listo para leer etiquetas RFID...":
-                # Extraer el UID eliminando el texto no deseado
-                prefix = "Número de serie de la tarjeta RFID:"
-                if rfid_data_full.startswith(prefix):
-                    rfid_data = rfid_data_full[len(prefix):].strip().replace(" ", "")
-                else:
-                    rfid_data = rfid_data_full.replace(" ", "")
+def leer_eliminar(request):
+    if request.method == 'POST':
+        codigo_barra = request.POST.get('codigo')
 
-                if rfid_data:                    
-                    print("RFID TAG: ", rfid_data)
+        if codigo_barra:
+            print("CÓDIGO DE BARRAS: ", codigo_barra)
 
-                    # Verificar si el UID ya existe en la base de datos
-                    existing_pechera = Pechera.objects.filter(id_pechera=rfid_data).first()
+            # Verificar si el UID ya existe en la base de datos
+            existing_pechera = Pechera.objects.filter(id_pechera=codigo_barra).first()
 
-                    if existing_pechera:
-                        print("UID ya existe en la base de datos")
+            if existing_pechera:
+                print("UID ya existe en la base de datos")
 
-                        # Generar la URL de la página 'lectura' con el ID de la pechera como parámetro
-                        url = reverse('eliminar') + f'?id={rfid_data}'
+                # Redirigir a la página 'eliminar' con el ID de la pechera como parámetro
+                url = reverse('eliminar') + f'?id={codigo_barra}'
 
-                        # Redirigir a la página 'lectura' con el ID de la pechera como parámetro en la URL
-                        return redirect(url)
-                    else:
-                        # Notificar al usuario
-                        print("UID no registrado en la base de datos")
-                        return redirect('eliminar_alerta')            
+                return redirect(url)
+            else:
+                print("UID no registrado en la base de datos")
+                return redirect('eliminar_alerta')
+        else:
+            print("No se ha ingresado ningún código de barras.")
+            return redirect('eliminar_alerta')
 
-    except KeyboardInterrupt:
-        print("Lectura de RFID detenida.")
-    except Exception as e:
-        print("Error: ", e)
-    finally:
-        if arduino is not None:
-            arduino.close()
-
-    return HttpResponse("Error en la lectura de datos, retroseda y recargue la pagina. IMPORTANTE: verifique que el dispositivo pueda leer información antes de comenzar la lectura.")   
+    return render(request, 'eliminar.html')  # Renderiza la página de eliminación si no es POST
 
 def eliminar_pechera(request):
     pechera = None
