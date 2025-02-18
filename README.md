@@ -46,7 +46,13 @@ Este proyecto tiene como objetivo proporcionar una plataforma en línea para ges
     python manage.py migrate
     ```
 
-5.  **Inicia el servidor de desarrollo:**
+5.  **Crea un superusuario:**
+
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+6.  **Inicia el servidor de desarrollo:**
 
     ```bash
     python manage.py runserver
