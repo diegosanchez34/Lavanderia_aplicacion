@@ -1,12 +1,12 @@
-# Lavandería
+# Laundry Management System
 
-Este es un proyecto web para De La Cruz Lavandería desarrollado con Django.
+This is a web project for De La Cruz Lavanderia developed with Django.
 
-## Descripción general
+## Overview
 
-Este proyecto tiene como objetivo proporcionar una plataforma en línea para gestionar las operaciones de registro de pecheras de una lavandería.
+This project provides an online platform to manage and track reusable aprons in a laundry facility. The system enables traceability of aprons through the use of barcode technology, allowing efficient registration, monitoring, and management of each item throughout its lifecycle.
 
-## Tecnologías utilizadas
+## Technologies Used
 
 - **Frontend:**
   - HTML5
@@ -16,54 +16,53 @@ Este proyecto tiene como objetivo proporcionar una plataforma en línea para ges
 - **Backend:**
   - Python
   - Django
-- **Base de datos:**
+- **Database:**
   - SQLite
 
-## Instalación
+## Installation
 
-1.  **Clona el repositorio:**
+1.  **Clone the repository:**
 
     ```bash
     git clone https://github.com/diegosanchez34/Lavanderia_aplicacion.git
     ```
 
-2.  **Crea y activa un entorno virtual:**
+2.  **Create and activate a virtual environment:**
 
     ```bash
     python -m venv .venv
     .venv\Scripts\activate
     ```
 
-3.  **Instala las dependencias:**
+3.  **Install dependencies:**
 
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Migra las bases de datos:**
+4.  **Apply database migrations:**
 
     ```bash
     python manage.py migrate
     ```
 
-5.  **Crea un superusuario:**
+5.  **Create a superuser:**
 
     ```bash
     python manage.py createsuperuser
     ```
 
-6.  **Inicia el servidor de desarrollo:**
+6.  **Start the development server:**
 
     ```bash
     python manage.py runserver
     ```
 
-## Licencia
+## License
 
-Este proyecto está licenciado bajo la [Licencia Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-Opción 2: Texto abreviado
+This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).
 
-## Contacto
+## Contact
 
-- Nombre: Diego Sánchez
-- Correo electrónico: diegosanchez1234567@gmail.com
+- Name: Diego Sánchez
+- Email: diegosanchez1234567@gmail.com
